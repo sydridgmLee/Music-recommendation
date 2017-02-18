@@ -1,0 +1,47 @@
+##################################################################
+## g_Hierarchy.py
+#Generate hierarchy structure for a list of track items.
+
+##################################################################
+### Libraries & Functions
+## Load Libraries
+from __future__ import print_function
+import time
+import os
+
+## Define variables
+TRACK_DATA_FILE = "../raw_data/trackData2.txt"
+TRACK_HIERARCHY_FILE = "training_user_tracks_info.csv"
+TEST_DATA_FILE = "../raw_data/training_data.txt"
+
+##################################################################
+### Main Program
+## Load trackData2.txt as Library for hierarchy structure.
+# Define hte track-hierarchy structure
+lib_trackData = {}
+start_time = time.time()
+# Hierarchy structure of all the track items are stored in trackData2.txt
+with open(TRACK_DATA_FILE) as trackData:
+	for line in trackData:
+		# We only need the track ID as index, so only split once
+		[track_Id,track_detail] = line.strip("\n").split("|",1)
+		lib_trackData[track_Id] = track_detail
+
+## Load list of track items and save the hierarchy structure in a new file
+# Open the destiantion file. You can change to your own
+with open(TRACK_HIERARCHY_FILE,"w") as testHierarchy:
+	# Open the source file, you can use your own source
+	with open(TEST_DATA_FILE) as testData:
+		for line in testData:
+			# "|" represent user information
+			if "|" in line:
+				[cur_user,cur_track] = line.strip("\n").split("|")
+			# Track item have no "|" in the line
+			else:
+				track_response = line.strip("\n").split("\t")
+				testHierarchy.write(cur_user+","
+                                    + track_response[1] + ","
+                                    + track_response[0] +","+
+                                    lib_trackData[track_response[0]].replace("|", ",") +" \n")
+			print(cur_user)
+print("Finished, Spend %.2f s"%(time.time()-start_time))
